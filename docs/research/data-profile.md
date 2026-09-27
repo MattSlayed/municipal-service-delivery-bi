@@ -58,7 +58,11 @@ The gap between median and 90th percentile is large everywhere. Averages would m
 | 30 Sep | 22,853 |
 | 31 Dec | 30,845 |
 
-The open backlog roughly doubled in the second half of 2020.
+**Correction (27 September 2026):** these totals are not comparable across the year. Requests
+created before 2020 are not in the data, so on 31 March no open request can be older than 90 days,
+while on 31 December 9,830 are. Compared like for like, open work less than 90 days old went from
+14,504 (31 March) to 9,489 (30 June, lockdown), 15,685 (30 September) and 21,015 (31 December):
+up 45% from March to December, not a doubling.
 
 ### Monthly volume
 

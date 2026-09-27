@@ -5,9 +5,9 @@ open work is building up, when to call in contractors, and where operations are 
 Its centrepiece is an **Operations Map** that highlights every location with open maintenance work
 at a chosen moment.
 
-**Status: design phase. Nothing is built yet.** Requirements are being worked through with the
-BMAD method. Planning artifacts land in `_bmad-output/planning-artifacts/` as each phase produces
-them; this README is updated when something is real.
+**Status: v1.0 in build.** The brief and spec are final and the data pipeline runs; the Power BI
+model and report are next. Planning artifacts are in `_bmad-output/`; this README is updated when
+something is real.
 
 ---
 
@@ -33,17 +33,26 @@ To be tested in the product brief, not assumed:
 ## Repository layout
 
 ```
-_bmad/                  BMAD install (config, shared scripts)
-.claude/skills/         BMAD agents and workflows for Claude Code
-_bmad-output/           Planning and implementation artifacts produced by the BMAD phases
-docs/research/          Domain notes and sources feeding the Analysis phase
+pipeline/               Download, scope, clean, star schema, reference values
+tests/                  pytest: cleaning rules, measure definitions, reconciliation
+docs/                   Research notes, data profile, generated data-quality report
+_bmad-output/           Brief, spec and later implementation artifacts (BMAD)
+_bmad/, .claude/skills/ BMAD install for Claude Code
 ```
-
-Data, model and test folders are added once the Solutioning phase has decided their shape.
 
 ## Working on this repo
 
-Requirements: Node.js 20.12+, [uv](https://docs.astral.sh/uv/), Claude Code. Power BI Desktop
-(Windows) is needed from the Implementation phase onward.
+Requirements: [uv](https://docs.astral.sh/uv/) and, for the model and report, Power BI Desktop
+on Windows.
+
+```
+uv run python -m pipeline.run   # downloads the City's data, writes data/processed/*.parquet
+uv run pytest                   # cleaning rules, measure definitions, reconciliation
+```
+
+The pipeline takes about 20 seconds after the first download. Source data is published by the
+City of Cape Town and is not stored in this repository. See the
+[data-quality report](docs/data-quality-report.md) for what the cleaning keeps, flags and
+quarantines.
 
 Open the repo in Claude Code and run `/bmad-help` to see where the project is and what comes next.

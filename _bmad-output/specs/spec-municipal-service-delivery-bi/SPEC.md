@@ -18,10 +18,11 @@ sources:
 
 **Pain to solve, under a deadline.** The City of Cape Town's Director of Water and Sanitation must
 decide each week whether field crews can clear open work or contractors must be called in, and
-where operations are held up. In 2020, open field work doubled between March and December, and the
-slowest tenth of sewer jobs took more than 144 days against a median of 2.4. Department totals do
+where operations are held up. In 2020, open field work less than 90 days old rose by 45% between
+the end of March and the end of December; in the sewer section the median job took 2.5 days, but
+the slowest tenth took more than 144. Department totals do
 not show where work is building up or which jobs are stuck. The dashboard must also stand as
-public portfolio evidence by the application date next week.
+public portfolio evidence by 4 October 2026.
 
 ## Capabilities
 
@@ -55,7 +56,8 @@ public portfolio evidence by the application date next week.
 - Built in Power BI Desktop on Windows; the model is saved as PBIP/TMDL in git. No Power BI Service account: no publish-to-web, scheduled refresh or row-level security.
 - Raw and processed data are not committed; the pipeline regenerates them and runs on Windows and Linux.
 - The measures carrying the core logic (open at *t*, weeks to clear, contractor flag) are written by hand by Matthew. Agents may write the rest and the tests.
-- Budget: about 20–24 hours before the application date next week.
+- Budget: about 20–24 hours before 4 October 2026.
+- Requests created before 2020 are absent, so total open work is understated early in 2020. Comparisons over time use work less than 90 days old, complete from 31 March 2020.
 
 ## Non-goals
 
