@@ -27,7 +27,8 @@ To be tested in the product brief, not assumed:
 | Method | [BMAD](https://github.com/bmad-code-org/BMAD-METHOD) v6.12.0 — Analysis → Planning → Solutioning → Implementation |
 | Semantic model | Power BI Project (PBIP) with TMDL, version-controlled as text |
 | Model authoring and testing | [Power BI Authoring MCP server](https://github.com/microsoft/powerbi-modeling-mcp) v1.0.0 — measures validated by DAX query, row-level security validated by role impersonation |
-| Data | Synthetic operational data from a documented generator, plus public financial data from National Treasury's Municipal Money. No real citizen data. |
+| Data | Real, openly published municipal data: service requests from a metro's open data portal (candidate: City of Cape Town), financials from National Treasury's Municipal Money, households from Census 2022. |
+| Releases | Versioned (v1.0, v1.1, ...), each tagged with a changelog and a short retrospective |
 
 ## Repository layout
 

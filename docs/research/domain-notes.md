@@ -27,6 +27,7 @@ requirements. Items marked **[verify]** have not been checked against a primary 
 
 | Source | Use | Notes |
 |---|---|---|
+| City of Cape Town Open Data Portal ([odp-cctegis.opendata.arcgis.com](https://odp-cctegis.opendata.arcgis.com/)) | Real service-request records; ward, subcouncil and suburb boundaries | The City's own [data-science code challenge](https://github.com/cityofcapetown/ds_code_challenge) uses ~941k service requests with H3 level-8 hexagons, and states that notification and reference numbers are removed before publication. **[verify]** Date range, refresh cadence, fields and licence terms of the portal dataset |
 | Municipal Money, National Treasury ([municipalmoney.gov.za](https://municipalmoney.gov.za), API at [municipaldata.treasury.gov.za](https://municipaldata.treasury.gov.za)) | Budgets, spending, repairs and maintenance, unauthorised/irregular/fruitless expenditure, audit outcomes | Real data for the financial-health page |
 | MFMA Circular 71 | Financial ratio norms | Repairs and maintenance as % of property, plant and equipment: norm of 8% |
 | Stats SA, Census 2022 | Households and access to services by municipality and ward | Denominators for per-household rates |
@@ -36,16 +37,19 @@ requirements. Items marked **[verify]** have not been checked against a primary 
 
 - Service requests carry names, phone numbers and addresses: personal information under the
   Protection of Personal Information Act 4 of 2013 (POPIA).
-- This project uses synthetic operational data only. The Power BI Authoring MCP server sends model
-  metadata and query results to the AI provider, which is acceptable for synthetic and public data
-  and would not be for a production model holding citizen data.
+- This project uses only data a municipality has already published as open data, in the form it
+  was published. No attempt is made to re-identify residents or to enrich records with personal
+  information from elsewhere.
+- The Power BI Authoring MCP server sends model metadata and query results to the AI provider.
+  That is acceptable for published open data and would not be for a production model holding
+  citizen data.
 
 ## Open questions for the product brief
 
 1. Who is the primary user: the municipal manager, a department director, a ward councillor, or a
    call-centre supervisor? What decision does each make that this dashboard should change?
-2. One fictional municipality, or a fictional operational layer on top of a real municipality's
-   public financial data?
+2. Which municipality? Real data was chosen, so the choice depends on who publishes
+   service-request records. Cape Town is confirmed; other metros not yet checked.
 3. What counts as "resolved": closed by the call centre, closed by the field team, or confirmed by
    the resident?
 4. Which service categories are in scope for the first release?
