@@ -3,7 +3,7 @@
 A Power BI dashboard for the Director of Water and Sanitation in a South African metro: where
 open work is building up, when to call in contractors, and where operations are bottlenecked.
 Its centrepiece is an **Operations Map** that highlights every location with open maintenance work
-at a chosen moment.
+on a chosen date.
 
 **Status: v1.0 in build.** The brief and spec are final and the data pipeline runs; the Power BI
 model and report are next. Planning artifacts are in `_bmad-output/`; this README is updated when
@@ -11,9 +11,9 @@ something is real.
 
 ---
 
-## Working hypothesis
+## The problem
 
-To be tested in the product brief, not assumed:
+From the [product brief](_bmad-output/planning-artifacts/briefs/brief-municipal-service-delivery-bi-2026-09-27/brief.md):
 
 > A Water and Sanitation Director with a finite pool of field crews has to decide, week by week,
 > when internal capacity is not enough and contractors must be called in, and which part of
