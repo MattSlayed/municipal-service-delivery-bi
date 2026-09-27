@@ -73,7 +73,8 @@ managers.
 - Every measure shown matches an independently computed value in automated tests.
 - Raw field-work rows equal clean plus quarantined rows, and the dashboard shows the reconciliation.
 - Any number on screen can be traced to a cleaning rule, a measure definition and a test.
-- v1.0 is publicly viewable before the application date.
+- v1.0 is publicly viewable before the application date: repository, screenshots and a short video
+  walkthrough. (No Power BI Service account is available, so there is no live published link.)
 
 ## Scope
 
