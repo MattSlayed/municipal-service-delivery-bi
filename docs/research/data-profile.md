@@ -70,9 +70,13 @@ must say so.
 
 | Issue | Count | Handling (proposed) |
 |---|---|---|
-| Completed before created | 503 (W&S) | Exclude from duration measures, count and show them |
-| No location | 9% of field work | Keep in totals, exclude from the map, show the share |
-| Same code, same hexagon, same day | 94,255 (field work) | Likely repeat reports of one fault, but not certainly. Flag, do not delete |
+| Completed before created | 478 (field work) | Quarantine with reason code |
+| Closed within 5 minutes of creation | 5,363 (field work) | Probably administrative closures, not repairs (1,868 are burst pipes). Decision pending |
+| No location | 31,761 (9.0% of field work) | Keep in totals, exclude from the map, show the share |
+| No section | 35,939 (10.2% of field work) | Keep as "Unassigned section" |
+| Open or took more than 365 days | 3,117 (field work) | Keep: this tail is the bottleneck finding |
+| Exact duplicate records or notification numbers | 0 | Nothing to remove; the check stays in the pipeline as a guard |
+| Same fault type, same hexagon, same day | 70,296 (22.0% of located field work) | Likely repeat reports of one fault, but not certainly. Flag, do not delete. *Corrected: an earlier count of 94,255 wrongly grouped all unlocated requests into one hexagon* |
 | Never completed | 145 (W&S) | Open at every point in time after creation |
 
 ## What this means for the design
