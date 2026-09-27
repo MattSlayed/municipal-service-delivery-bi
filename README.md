@@ -1,8 +1,9 @@
 # Municipal Service Delivery BI
 
-A Power BI command centre for South African municipal service delivery: which service requests are
-breaching turnaround times, where faults recur, and whether the maintenance budget matches the
-backlog.
+A Power BI dashboard for the Director of Water and Sanitation in a South African metro: where
+open work is building up, when to call in contractors, and where operations are bottlenecked.
+Its centrepiece is an **Operations Map** that highlights every location with open maintenance work
+at a chosen moment.
 
 **Status: design phase. Nothing is built yet.** Requirements are being worked through with the
 BMAD method. Planning artifacts land in `_bmad-output/planning-artifacts/` as each phase produces
@@ -27,7 +28,7 @@ To be tested in the product brief, not assumed:
 | Method | [BMAD](https://github.com/bmad-code-org/BMAD-METHOD) v6.12.0 — Analysis → Planning → Solutioning → Implementation |
 | Semantic model | Power BI Project (PBIP) with TMDL, version-controlled as text |
 | Model authoring and testing | [Power BI Authoring MCP server](https://github.com/microsoft/powerbi-modeling-mcp) v1.0.0 — measures validated by DAX query, row-level security validated by role impersonation |
-| Data | Real, openly published municipal data: service requests from a metro's open data portal (candidate: City of Cape Town), financials from National Treasury's Municipal Money, households from Census 2022. |
+| Data | Real, published municipal data: City of Cape Town service requests (941,634 requests created in 2020; see [data profile](docs/research/data-profile.md)), financials from National Treasury's Municipal Money. |
 | Releases | Versioned (v1.0, v1.1, ...), each tagged with a changelog and a short retrospective |
 
 ## Repository layout

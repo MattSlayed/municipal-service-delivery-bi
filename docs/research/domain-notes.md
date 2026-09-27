@@ -27,7 +27,7 @@ requirements. Items marked **[verify]** have not been checked against a primary 
 
 | Source | Use | Notes |
 |---|---|---|
-| City of Cape Town Open Data Portal ([odp-cctegis.opendata.arcgis.com](https://odp-cctegis.opendata.arcgis.com/)) | Real service-request records; ward, subcouncil and suburb boundaries | The City's own [data-science code challenge](https://github.com/cityofcapetown/ds_code_challenge) uses ~941k service requests with H3 level-8 hexagons, and states that notification and reference numbers are removed before publication. **[verify]** Date range, refresh cadence, fields and licence terms of the portal dataset |
+| City of Cape Town Open Data Portal ([odp-cctegis.opendata.arcgis.com](https://odp-cctegis.opendata.arcgis.com/)) | Real service-request records; ward, subcouncil and suburb boundaries | Verified 2026-09-27 from the City's [code-challenge copy](https://github.com/cityofcapetown/ds_code_challenge): 941,634 requests created in 2020, with coordinates, suburb and H3 level-8 hexagon. See [data-profile.md](data-profile.md). **[verify]** Reuse terms; the portal page was unreachable |
 | Municipal Money, National Treasury ([municipalmoney.gov.za](https://municipalmoney.gov.za), API at [municipaldata.treasury.gov.za](https://municipaldata.treasury.gov.za)) | Budgets, spending, repairs and maintenance, unauthorised/irregular/fruitless expenditure, audit outcomes | Real data for the financial-health page |
 | MFMA Circular 71 | Financial ratio norms | Repairs and maintenance as % of property, plant and equipment: norm of 8% |
 | Stats SA, Census 2022 | Households and access to services by municipality and ward | Denominators for per-household rates |
@@ -46,10 +46,9 @@ requirements. Items marked **[verify]** have not been checked against a primary 
 
 ## Open questions for the product brief
 
-1. Who is the primary user: the municipal manager, a department director, a ward councillor, or a
-   call-centre supervisor? What decision does each make that this dashboard should change?
-2. Which municipality? Real data was chosen, so the choice depends on who publishes
-   service-request records. Cape Town is confirmed; other metros not yet checked.
+1. ~~Who is the primary user?~~ Director of Water and Sanitation: when to call in contractors, and
+   where operations are bottlenecked (decided).
+2. ~~Which municipality?~~ City of Cape Town, Water and Sanitation (decided).
 3. What counts as "resolved": closed by the call centre, closed by the field team, or confirmed by
    the resident?
 4. Which service categories are in scope for the first release?
