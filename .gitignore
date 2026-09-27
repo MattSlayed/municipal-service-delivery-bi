@@ -1,0 +1,19 @@
+# Power BI Project (PBIP): per-user settings and local data cache
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+
+# Secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
