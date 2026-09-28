@@ -22,7 +22,7 @@ def main() -> None:
 
     tables = model.build(labelled, paths[config.HEXAGONS_FILE])
     hexes = tables["dim_hex"]
-    unmapped = hexes.loc[hexes["geometry"].isna() & hexes["hex_id"].ne(config.UNLOCATED_HEX), "hex_key"]
+    unmapped = hexes.loc[hexes["coords"].isna() & hexes["hex_id"].ne(config.UNLOCATED_HEX), "hex_key"]
     summary.loc[len(summary)] = ["Hexagon missing from the City's polygon file",
                                  int(tables["fact_request"]["hex_key"].isin(unmapped).sum()),
                                  "Kept; not on the map"]
@@ -34,6 +34,9 @@ def main() -> None:
 
     expected = reference.compute(labelled, len(scoped), quarantine)
     reference.write(expected, config.PROCESSED_DIR / "reference_values.json")
+    for date in config.REFERENCE_DATES:
+        rows = reference.map_dataset(labelled, tables["dim_hex"], reference.as_at_end(date))
+        reference.write(rows, config.PROCESSED_DIR / "map" / f"{date}.json")
     checksums = {name: download.sha256(path) for name, path in paths.items()}
     report.write_markdown(summary, checksums, expected["transparency"]["reconciles"])
 

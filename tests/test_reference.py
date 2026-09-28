@@ -39,15 +39,39 @@ def test_four_week_window_includes_the_week_ending_on_a_sunday():
     assert (start, end) == (pd.Timestamp("2020-03-02"), pd.Timestamp("2020-03-30"))
 
 
+def test_age_is_whole_days_elapsed():
+    df = frame([("A", "2020-03-30 23:00:00", None, False), ("A", "2020-03-31 00:30:00", None, False)])
+    assert reference.age_days(df, T).tolist() == [1, 0]
+
+
+def test_active_and_stuck_split_at_90_days():
+    df = frame([
+        ("A", "2020-01-01 00:00:00", None, False),  # 90 whole days at t: still active
+        ("A", "2019-12-31 23:00:00", None, False),  # 91 whole days at t: stuck
+    ])
+    assert reference.active_at(df, T).tolist() == [True, False]
+    assert reference.stuck_at(df, T).tolist() == [False, True]
+
+
 def test_weeks_to_clear_and_flag():
     completions = [("A", "2020-02-20", f"2020-03-{d:02d} 12:00", False) for d in range(2, 30)]  # 28 = 7/week
     admin = [("A", "2020-03-10", "2020-03-10 00:01", True)] * 50  # never counted as throughput
-    backlog = [("A", "2020-03-15", None, False)] * 21  # 21 open / 7 per week = 3 weeks
-    table = reference.weeks_to_clear(frame(completions + admin + backlog), T, "section")
+    backlog = [("A", "2020-03-15", None, False)] * 28  # 28 active / 7 per week = 4 weeks
+    stuck = [("A", "2019-11-01", None, False)] * 100  # over 90 days: excluded from weeks to clear
+    table = reference.weeks_to_clear(frame(completions + admin + backlog + stuck), T, "section")
     row = table.loc["A"]
     assert row["avg_weekly_completions"] == 7
-    assert row["weeks_to_clear"] == 3
-    assert row["flag"]  # 3 > default threshold of 2
+    assert row["active"] == 28
+    assert row["weeks_to_clear"] == 4
+    assert row["flag"]  # 4 > default threshold of 3
+
+
+def test_weeks_to_clear_at_the_threshold_is_not_flagged():
+    completions = [("A", "2020-02-20", f"2020-03-{d:02d} 12:00", False) for d in range(2, 30)]
+    backlog = [("A", "2020-03-15", None, False)] * 21  # exactly 3 weeks
+    row = reference.weeks_to_clear(frame(completions + backlog), T, "section").loc["A"]
+    assert row["weeks_to_clear"] == config.DEFAULT_THRESHOLD_WEEKS
+    assert not row["flag"]
 
 
 def test_weeks_to_clear_is_blank_below_minimum_throughput():

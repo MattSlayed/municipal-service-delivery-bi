@@ -2,6 +2,7 @@
 id: SPEC-municipal-service-delivery-bi
 companions:
   - measures.md
+  - ../../../powerbi/deneb/README.md
   - data-model.md
   - stack.md
   - ../../planning-artifacts/briefs/brief-municipal-service-delivery-bi-2026-09-27/addendum.md
@@ -20,8 +21,8 @@ sources:
 decide each week whether field crews can clear open work or contractors must be called in, and
 where operations are held up. In 2020, open field work less than 90 days old rose by 45% between
 the end of March and the end of December; in the sewer section the median job took 2.5 days, but
-the slowest tenth took more than 144. Department totals do
-not show where work is building up or which jobs are stuck. The dashboard must also stand as
+the slowest tenth took more than 144. Department totals do not show where work is building up
+or which jobs are stuck. The dashboard must also stand as
 public portfolio evidence by 4 October 2026.
 
 ## Capabilities
@@ -33,14 +34,14 @@ public portfolio evidence by 4 October 2026.
   - **intent:** The Director sees whether crews are keeping up: open work over time, and requests in against completions per week.
   - **success:** Open-at-date and weekly counts in Power BI equal the pipeline's reference values for the test dates in `measures.md`.
 - **CAP-3** Contractor flag
-  - **intent:** The Director sees weeks to clear per section and suburb, flagged where it exceeds a threshold they set.
-  - **success:** For a given as-at date and threshold, the flagged set in Power BI equals the reference computation; the threshold is adjustable, default 2 weeks.
+  - **intent:** The Director sees which sections cannot clear their active work in time, and which suburbs inside a flagged section to send contractors to.
+  - **success:** For a given as-at date and threshold, the flagged sections and the suburb ranking inside each equal the reference computation; the threshold is adjustable, default 3 weeks.
 - **CAP-4** Operations Map
   - **intent:** The Director sees every location with open field work at a chosen date, highlighted on a map of the City.
   - **success:** Highlighted hexagons and their open counts at a chosen date equal the reference; unlocated open requests are reported as a share, not mapped.
 - **CAP-5** Bottlenecks
-  - **intent:** The Director sees which section, suburb and fault type hold work up.
-  - **success:** Median and 90th-percentile days to complete, and ageing buckets of open work, equal the reference values per section.
+  - **intent:** The Director sees which section, suburb and fault type hold work up, including stuck work: open for more than 90 days.
+  - **success:** Median and 90th-percentile days to complete, ageing buckets and stuck counts of open work equal the reference values per section.
 - **CAP-6** Data transparency
   - **intent:** Every viewer sees what the data can and cannot show.
   - **success:** Reconciliation, likely-repeat share, admin-closure share, unlocated share and the 2020/COVID caveat are visible on the dashboard and equal pipeline counts.
@@ -58,6 +59,8 @@ public portfolio evidence by 4 October 2026.
 - The measures carrying the core logic (open at *t*, weeks to clear, contractor flag) are written by hand by Matthew. Agents may write the rest and the tests.
 - Budget: about 20–24 hours before 4 October 2026.
 - Requests created before 2020 are absent, so total open work is understated early in 2020. Comparisons over time use work less than 90 days old, complete from 31 March 2020.
+- Open work splits into **active** (open 90 days or less) and **stuck** (open more than 90 days). The contractor flag uses active work only: stuck work is blocked, not short of capacity, and belongs to Bottlenecks.
+- The contractor flag is raised per section; suburbs are ranked inside a flagged section, not flagged independently.
 
 ## Non-goals
 
@@ -77,8 +80,9 @@ every number shown passes its automated comparison with the pipeline's reference
 
 ## Assumptions
 
-- Weeks to clear is calculated per official suburb; hexagons are used for the map only.
-- Weeks to clear is left blank where average weekly completions are below 5, so small suburbs do not raise noise-driven flags.
+- The default threshold of 3 weeks sits just above the pre-lockdown norm (2.8–2.9 weeks for the reticulation sections on 31 March 2020), so a flag means worse than usual.
+- Suburbs inside a flagged section are ranked by active open work; hexagons are used for the map only.
+- Weeks to clear is left blank where average weekly completions are below 5, so small sections and suburbs do not produce noise-driven values.
 - Duration measures are grouped by creation date.
 - Requests closed within 5 minutes are administrative closures, not repairs.
 - The City's published dataset may be reused in a public portfolio with attribution (unverified).
@@ -86,5 +90,5 @@ every number shown passes its automated comparison with the pipeline's reference
 
 ## Open Questions
 
-- Map rendering: Deneb with hexagon polygons, or the fallback of a bubble map at hexagon centres? Decided by the Day 3 test.
-- Should the contractor flag list section × suburb combinations, or flag at section level with suburb drill-down?
+- Map rendering: the Deneb spec (`powerbi/deneb/`) renders correctly outside Power BI; confirm in Power BI Desktop, or fall back to a bubble map at hexagon centres.
+- Should the contractor flag be limited to field-crew sections? Small administrative sections are flagged on every test date, but contractors are not called for them.

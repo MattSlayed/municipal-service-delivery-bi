@@ -62,19 +62,48 @@ def _dimension(df: pd.DataFrame, columns: list[str], key: str) -> pd.DataFrame:
 
 
 def _hex_dimension(df: pd.DataFrame, hexagons_path) -> pd.DataFrame:
+    """Every hexagon of the City (so the map draws the whole municipality), plus any hexagon a
+    request uses that the polygon file lacks, plus the "0" placeholder for unlocated requests."""
     with open(hexagons_path, encoding="utf-8") as f:
         features = json.load(f)["features"]
     polygons = pd.DataFrame({
         "hex_id": [ft["properties"]["index"] for ft in features],
         "centroid_lat": [ft["properties"]["centroid_lat"] for ft in features],
         "centroid_lon": [ft["properties"]["centroid_lon"] for ft in features],
-        "geometry": [json.dumps(ft["geometry"], separators=(",", ":")) for ft in features],
+        "coords": [_map_coords(ft["geometry"]["coordinates"][0]) for ft in features],
     })
-    used = pd.DataFrame({"hex_id": sorted(df["h3_level8_index"].unique())})
-    dim = used.merge(polygons, on="hex_id", how="left", validate="one_to_one")
+    used = pd.DataFrame({"hex_id": df["h3_level8_index"].unique()})
+    dim = (
+        polygons.merge(used, on="hex_id", how="outer", validate="one_to_one")
+        .sort_values("hex_id", ignore_index=True)
+    )
     dim["hex_label"] = dim["hex_id"].where(dim["hex_id"].ne(config.UNLOCATED_HEX), "Unlocated")
+    dim["area"] = dim["hex_id"].map(_main_suburb(df))
     dim.insert(0, "hex_key", range(1, len(dim) + 1))
     return dim
+
+
+def _main_suburb(df: pd.DataFrame) -> pd.Series:
+    """The suburb most requests in each hexagon name, so the map tooltip reads as a place."""
+    located = df.loc[df["h3_level8_index"].ne(config.UNLOCATED_HEX)]
+    counts = located.groupby(["h3_level8_index", "official_suburb"]).size().reset_index(name="n")
+    return (
+        counts.sort_values(["h3_level8_index", "n", "official_suburb"], ascending=[True, False, True])
+        .drop_duplicates("h3_level8_index")
+        .set_index("h3_level8_index")["official_suburb"]
+    )
+
+
+def _map_coords(ring: list[list[float]]) -> str:
+    """Flatten a polygon ring to "lon,lat,lon,lat,..." wound clockwise.
+
+    Vega draws with d3-geo, which treats an anticlockwise ring as "the whole globe except this
+    hexagon" and floods the map. The shoelace sum is positive for anticlockwise rings.
+    """
+    shoelace = sum(x1 * y2 - x2 * y1 for (x1, y1), (x2, y2) in zip(ring, ring[1:]))
+    if shoelace > 0:
+        ring = ring[::-1]
+    return ",".join(f"{value:.{config.MAP_COORD_DECIMALS}f}" for point in ring for value in point)
 
 
 def _date_dimension(first: pd.Timestamp, last: pd.Timestamp) -> pd.DataFrame:

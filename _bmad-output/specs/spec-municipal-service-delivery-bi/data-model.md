@@ -24,7 +24,7 @@ erDiagram
 | `dim_section` | One section | `department`, `branch`, `section`; missing values → "Unassigned section" |
 | `dim_fault_type` | One `code` | `code_group`, `code`, `is_informal_settlement` |
 | `dim_suburb` | One official suburb | `suburb`; missing → "Unknown suburb" |
-| `dim_hex` | One H3 level-8 hexagon | `hex_id`, `centroid_lat`, `centroid_lon`, `geometry` (GeoJSON, for the map); `0` → "Unlocated" |
+| `dim_hex` | One H3 level-8 hexagon: every hexagon in the City's polygon file, any other hexagon used by a request, and `0` → "Unlocated" | `hex_id`, `hex_label`, `area` (the suburb most of its requests name), `centroid_lat`, `centroid_lon`, `coords` (the ring's 7 vertices as a flat `lon,lat,…` string, wound clockwise, for the Deneb map) |
 | `as_at` | One day in 2020 | `as_at_date`, `as_at_end` (23:59:59 SAST) |
 | `quarantine` | One quarantined request | source columns + `reason_code` |
 | `dq_summary` | One rule | `rule`, `rows`, `action` |

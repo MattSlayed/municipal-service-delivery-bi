@@ -23,13 +23,21 @@ Counts are after quarantine, from `docs/data-quality-report.md`.
 pipes, which cannot be repaired in 5 minutes. Counting them as completions would overstate crew
 capacity and delay the contractor flag.
 
-## Contractor flag (agreed)
+## Contractor flag (agreed; revised 28 September 2026)
 
-- **Weeks to clear** = open requests ÷ average weekly completions over the previous four weeks,
-  calculated per section and per area.
+- **Active work** is open 90 days or less; **stuck work** is open more than 90 days. Stuck work is
+  blocked rather than short of capacity, so it belongs on the Bottlenecks page.
+- **Weeks to clear** = active open requests ÷ average weekly completions over the previous four
+  weeks, per section.
 - Completions exclude `ADMIN_CLOSURE` rows (see Cleaning rules).
-- **Flag** when weeks to clear exceeds a threshold the Director sets with a slider. Default: 2 weeks.
+- **Flag** a section when weeks to clear exceeds a threshold the Director sets with a slider.
+  Default: 3 weeks, just above the pre-lockdown norm of 2.8–2.9 weeks, so a flag means worse
+  than usual.
+- Inside a flagged section, suburbs are ranked by active open work to show where contractors go.
 - Completions per week stand in for crew capacity, which is not in the data.
+- **Why revised:** on the real data, the original rule (all open work, 2-week default, per suburb)
+  flagged normal pre-lockdown operations and 111 of 301 suburbs at once, and stuck jobs nearly
+  doubled sewer's weeks to clear on 31 December (8.4, against 4.6 for active work).
 
 ## Operations Map
 

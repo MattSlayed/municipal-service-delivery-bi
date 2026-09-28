@@ -28,6 +28,20 @@ def open_at(df: pd.DataFrame, t: pd.Timestamp) -> pd.Series:
     return (df["created_at"] <= t) & (df["completed_at"].isna() | (df["completed_at"] > t))
 
 
+def age_days(df: pd.DataFrame, t: pd.Timestamp) -> pd.Series:
+    """Whole days elapsed since creation (floor). With t at 23:59:59 this equals calendar days."""
+    return (t - df["created_at"]).dt.days
+
+
+def active_at(df: pd.DataFrame, t: pd.Timestamp) -> pd.Series:
+    """Open at t and no older than the active window; older open work is stuck."""
+    return open_at(df, t) & (age_days(df, t) <= config.ACTIVE_MAX_AGE_DAYS)
+
+
+def stuck_at(df: pd.DataFrame, t: pd.Timestamp) -> pd.Series:
+    return open_at(df, t) & (age_days(df, t) > config.ACTIVE_MAX_AGE_DAYS)
+
+
 def counted_completions(df: pd.DataFrame) -> pd.DataFrame:
     """Completions that count towards throughput: administrative closures are not repairs."""
     return df.loc[df["completed_at"].notna() & ~df["is_admin_closure"]]
@@ -40,24 +54,39 @@ def four_week_window(t: pd.Timestamp) -> tuple[pd.Timestamp, pd.Timestamp]:
     return end - 4 * WEEK, end
 
 
-def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str) -> pd.DataFrame:
+def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str | list[str]) -> pd.DataFrame:
+    """Active open work ÷ average weekly completions over the four full weeks ending at t."""
     start, end = four_week_window(t)
     done = counted_completions(df)
     in_window = done.loc[(done["completed_at"] >= start) & (done["completed_at"] < end)]
     table = pd.DataFrame({
-        "open": df.loc[open_at(df, t)].groupby(by).size(),
+        "active": df.loc[active_at(df, t)].groupby(by).size(),
         "avg_weekly_completions": in_window.groupby(by).size() / 4,
     }).fillna(0)
+    table["active"] = table["active"].astype(int)
     enough = table["avg_weekly_completions"] >= config.MIN_WEEKLY_COMPLETIONS
-    table["weeks_to_clear"] = np.where(enough, table["open"] / table["avg_weekly_completions"], np.nan)
+    table["weeks_to_clear"] = np.where(enough, table["active"] / table["avg_weekly_completions"], np.nan)
     table["flag"] = table["weeks_to_clear"] > config.DEFAULT_THRESHOLD_WEEKS
     return table.sort_values("weeks_to_clear", ascending=False)
 
 
-def age_buckets(df: pd.DataFrame, t: pd.Timestamp) -> dict[str, int]:
-    age_days = (t - df.loc[open_at(df, t), "created_at"]).dt.days
+def suburb_rank(df: pd.DataFrame, t: pd.Timestamp, sections: list[str], top: int = 10) -> dict:
+    """Inside each flagged section, suburbs by active open work, highest first."""
+    table = weeks_to_clear(df, t, ["section", "official_suburb"]).drop(columns="flag").reset_index()
     return {
-        label: int(age_days.between(low, high if high is not None else np.inf).sum())
+        section: _records(
+            table.loc[table["section"].eq(section)]
+            .sort_values(["active", "official_suburb"], ascending=[False, True])
+            .drop(columns="section").head(top).set_index("official_suburb")
+        )
+        for section in sections
+    }
+
+
+def age_buckets(df: pd.DataFrame, t: pd.Timestamp) -> dict[str, int]:
+    ages = age_days(df.loc[open_at(df, t)], t)
+    return {
+        label: int(ages.between(low, high if high is not None else np.inf).sum())
         for low, high, label in config.AGE_BUCKETS
     }
 
@@ -106,22 +135,44 @@ def compute(df: pd.DataFrame, scoped_rows: int, quarantine: pd.DataFrame) -> dic
         t = as_at_end(date)
         open_now = df.loc[open_at(df, t)]
         by_hex = open_now.loc[open_now["is_located"]].groupby("h3_level8_index").size()
-        by_suburb = weeks_to_clear(df, t, "official_suburb")
+        by_section = weeks_to_clear(df, t, "section")
+        flagged = by_section.index[by_section["flag"]].tolist()
         reference["as_at"][date] = {
             "open": len(open_now),
+            "active": int(active_at(df, t).sum()),
+            "stuck": int(stuck_at(df, t).sum()),
             "open_by_section": open_now.groupby("section").size().to_dict(),
+            "stuck_by_section": df.loc[stuck_at(df, t)].groupby("section").size().to_dict(),
             "age_buckets": age_buckets(df, t),
             "hexagons_with_open_work": len(by_hex),
             "top_hexagons": by_hex.sort_values(ascending=False).head(10).to_dict(),
             "unlocated_open": int((~open_now["is_located"]).sum()),
-            "weeks_to_clear_by_section": _records(weeks_to_clear(df, t, "section")),
-            "flagged_suburbs": _records(by_suburb.loc[by_suburb["flag"]]),
-            "suburbs_with_weeks_to_clear": int(by_suburb["weeks_to_clear"].notna().sum()),
+            "weeks_to_clear_by_section": _records(by_section),
+            "flagged_sections": flagged,
+            "suburb_rank_in_flagged_sections": suburb_rank(df, t, flagged),
         }
     return reference
 
 
-def write(reference: dict, path) -> None:
+def map_dataset(df: pd.DataFrame, dim_hex: pd.DataFrame, t: pd.Timestamp) -> list[dict]:
+    """The rows the Deneb Operations Map receives on date t: one per hexagon, with its measures."""
+    open_now = df.loc[open_at(df, t)].assign(age=lambda x: age_days(x, t))
+    per_hex = open_now.groupby("h3_level8_index").agg(
+        map_open=("age", "size"),
+        map_stuck=("age", lambda a: int((a > config.ACTIVE_MAX_AGE_DAYS).sum())),
+        map_oldest_days=("age", "max"),
+    )
+    rows = dim_hex[["hex_id", "area", "coords"]].merge(
+        per_hex, left_on="hex_id", right_index=True, how="left"
+    )
+    rows = rows.loc[rows["coords"].notna()].rename(columns={
+        "map_open": "Map Open", "map_stuck": "Map Stuck", "map_oldest_days": "Map Oldest Days",
+    })
+    rows["Map Open"] = rows["Map Open"].fillna(0).astype(int)
+    return json.loads(rows.to_json(orient="records"))
+
+
+def write(reference: dict | list, path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(reference, f, indent=1, default=_json_default)

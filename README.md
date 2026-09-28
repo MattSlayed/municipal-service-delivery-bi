@@ -5,9 +5,14 @@ open work is building up, when to call in contractors, and where operations are 
 Its centrepiece is an **Operations Map** that highlights every location with open maintenance work
 on a chosen date.
 
-**Status: v1.0 in build.** The brief and spec are final and the data pipeline runs; the Power BI
-model and report are next. Planning artifacts are in `_bmad-output/`; this README is updated when
-something is real.
+**Status: v1.0 in build.** The brief and spec are final, the data pipeline runs, and the
+Operations Map spec is render-tested; the Power BI model and report are next.
+
+![Operations Map render test, 31 March and 31 December 2020](docs/images/operations-map-render-test.png)
+
+*Render test of the [Operations Map](powerbi/deneb/) outside Power BI.*
+
+Planning artifacts are in `_bmad-output/`; this README is updated when something is real.
 
 ---
 
@@ -34,6 +39,7 @@ From the [product brief](_bmad-output/planning-artifacts/briefs/brief-municipal-
 
 ```
 pipeline/               Download, scope, clean, star schema, reference values
+powerbi/deneb/          Operations Map spec, set-up guide and render test
 tests/                  pytest: cleaning rules, measure definitions, reconciliation
 docs/                   Research notes, data profile, generated data-quality report
 _bmad-output/           Brief, spec and later implementation artifacts (BMAD)

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Operations Map: every H3 hexagon of the City of Cape Town, highlighted by the number of Water and Sanitation field-work requests open on the chosen date.",
+  "data": {"name": "dataset"},
+  "width": "container",
+  "height": "container",
+  "padding": 8,
+  "projection": {"type": "mercator"},
+  "transform": [
+    {"filter": "isValid(datum['coords']) && datum['coords'] != ''"},
+    {"calculate": "split(datum['coords'], ',')", "as": "c"},
+    {
+      "calculate": "{type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [[[toNumber(datum.c[0]), toNumber(datum.c[1])], [toNumber(datum.c[2]), toNumber(datum.c[3])], [toNumber(datum.c[4]), toNumber(datum.c[5])], [toNumber(datum.c[6]), toNumber(datum.c[7])], [toNumber(datum.c[8]), toNumber(datum.c[9])], [toNumber(datum.c[10]), toNumber(datum.c[11])], [toNumber(datum.c[12]), toNumber(datum.c[13])]]]}}",
+      "as": "shape"
+    },
+    {"calculate": "isValid(datum['Map Open']) ? datum['Map Open'] : 0", "as": "open"},
+    {
+      "calculate": "datum.open >= 50 ? '50 or more' : datum.open >= 25 ? '25–49' : datum.open >= 10 ? '10–24' : datum.open >= 5 ? '5–9' : datum.open >= 1 ? '1–4' : 'None'",
+      "as": "Open requests"
+    }
+  ],
+  "mark": {"type": "geoshape", "stroke": "#ffffff", "strokeWidth": 0.4},
+  "encoding": {
+    "shape": {"field": "shape", "type": "geojson"},
+    "color": {
+      "field": "Open requests",
+      "type": "ordinal",
+      "scale": {
+        "domain": ["None", "1–4", "5–9", "10–24", "25–49", "50 or more"],
+        "range": ["#e1e0d9", "#b7d3f6", "#6da7ec", "#2a78d6", "#1c5cab", "#0d366b"]
+      },
+      "legend": {"title": "Open requests", "orient": "top-left", "symbolType": "square"}
+    },
+    "order": {"field": "open", "type": "quantitative"},
+    "tooltip": [
+      {"field": "area", "type": "nominal", "title": "Area"},
+      {"field": "open", "type": "quantitative", "title": "Open requests", "format": ",.0f"},
+      {"field": "Map Stuck", "type": "quantitative", "title": "Stuck (over 90 days)", "format": ",.0f"},
+      {"field": "Map Oldest Days", "type": "quantitative", "title": "Oldest open (days)", "format": ",.0f"}
+    ]
+  },
+  "config": {
+    "view": {"stroke": null},
+    "font": "Segoe UI",
+    "legend": {
+      "titleFontSize": 12,
+      "titleFontWeight": "normal",
+      "titleColor": "#52514e",
+      "labelFontSize": 11,
+      "labelColor": "#52514e",
+      "symbolStrokeWidth": 0,
+      "symbolSize": 120
+    }
+  }
+}

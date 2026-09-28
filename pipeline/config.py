@@ -32,8 +32,10 @@ FIELD_CODE_GROUPS = {
 
 UNLOCATED_HEX = "0"
 ADMIN_CLOSURE_SECONDS = 300
+ACTIVE_MAX_AGE_DAYS = 90  # older open work is "stuck": blocked, not short of capacity
 MIN_WEEKLY_COMPLETIONS = 5
-DEFAULT_THRESHOLD_WEEKS = 2.0
+DEFAULT_THRESHOLD_WEEKS = 3.0  # just above the pre-lockdown norm of 2.8-2.9 weeks
 REFERENCE_DATES = ["2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31"]
 AGE_BUCKETS = [(0, 7, "0-7 days"), (8, 30, "8-30 days"), (31, 90, "31-90 days"),
-               (91, 365, "91-365 days"), (366, None, "Over 365 days")]
+               (91, None, "Over 90 days (stuck)")]
+MAP_COORD_DECIMALS = 5  # about 1 m; keeps the coords column small
