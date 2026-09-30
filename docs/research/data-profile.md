@@ -72,6 +72,10 @@ must say so.
 
 ## Data quality
 
+*Profiling snapshot, before cleaning rules were agreed. The authoritative counts are in the
+generated [data-quality report](../data-quality-report.md); the agreed handling is in the brief's
+addendum.*
+
 | Issue | Count | Handling (proposed) |
 |---|---|---|
 | Completed before created | 478 (field work) | Quarantine with reason code |
