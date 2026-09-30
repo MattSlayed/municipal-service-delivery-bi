@@ -30,7 +30,7 @@ plain language; the DAX is written against them. "Clean" means not quarantined.
 | Average weekly completions | Completions over the four weeks ending at *t*, ÷ 4 |
 | Weeks to clear | Active at *t* ÷ Average weekly completions. Blank when average weekly completions < 5 |
 | Threshold | What-if parameter, 0.5 to 8 weeks in steps of 0.5, default 3 |
-| Contractor flag | Weeks to clear > Threshold, per section |
+| Contractor flag | Weeks to clear > Threshold, per section; field-crew sections only (`dim_section`), never administrative ones |
 | Suburb rank | Inside a flagged section, suburbs ordered by Active at *t*, highest first, with their own weeks to clear beside it |
 
 ## Bottlenecks
