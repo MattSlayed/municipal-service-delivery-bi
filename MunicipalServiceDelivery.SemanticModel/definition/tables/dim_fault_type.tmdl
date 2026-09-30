@@ -1,0 +1,35 @@
+/// What was reported: code group and code.
+table dim_fault_type
+	lineageTag: 2864e9f2-fbbd-49d1-86c3-1bc35a75e987
+
+	column fault_type_key
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 801ab9b4-56de-4914-b410-60c64f800d3d
+		summarizeBy: none
+		sourceColumn: fault_type_key
+
+	column code_group
+		dataType: string
+		lineageTag: ee3861ac-9882-43aa-80c3-9fa78830efd4
+		sourceColumn: code_group
+
+	column code
+		dataType: string
+		lineageTag: 5829868c-465f-4c56-8671-db8ad1383670
+		sourceColumn: code
+
+	column is_informal_settlement
+		dataType: boolean
+		lineageTag: 2dc25adc-93c4-4428-b58b-fb7439871529
+		sourceColumn: is_informal_settlement
+
+	partition dim_fault_type = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dim_fault_type.parquet"))
+				in
+				    Source
+

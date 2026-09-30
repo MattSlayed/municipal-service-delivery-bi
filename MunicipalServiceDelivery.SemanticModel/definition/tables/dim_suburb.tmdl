@@ -1,0 +1,25 @@
+/// Official suburb named on the request. Missing values are 'Unknown suburb'.
+table dim_suburb
+	lineageTag: 5cd7870e-86fe-48a1-aa34-e104d1e5dc6f
+
+	column suburb_key
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 25511018-5b92-4a88-94ac-f6bce33858f3
+		summarizeBy: none
+		sourceColumn: suburb_key
+
+	column suburb
+		dataType: string
+		lineageTag: 1ecdde15-91c9-4d6e-ab85-32d384f49894
+		sourceColumn: suburb
+
+	partition dim_suburb = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dim_suburb.parquet"))
+				in
+				    Source
+

@@ -1,0 +1,106 @@
+/// One row per clean Water and Sanitation field-work service request created in 2020 (City of Cape Town). Quarantined rows are in 'quarantine'.
+table fact_request
+	lineageTag: 1bb80c5e-c015-40c1-9a3f-286c44ddff59
+
+	/// City notification number.
+	column request_id
+		dataType: string
+		lineageTag: 8dc1096d-2a23-4ec6-9f32-8e282d938407
+		sourceColumn: request_id
+
+	/// Creation time, SAST.
+	column created_at
+		dataType: dateTime
+		lineageTag: 2a6c21fe-9be7-492a-ba1e-9f506623bbc3
+		sourceColumn: created_at
+
+	/// Completion time, SAST. Blank if never completed.
+	column completed_at
+		dataType: dateTime
+		lineageTag: 99c9e8be-c472-4a22-8bbe-218e672ce592
+		sourceColumn: completed_at
+
+	column created_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 3fd7b328-c2ef-4be7-8d89-76ab0ad1d7c5
+		summarizeBy: none
+		sourceColumn: created_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column completed_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: c3cc5168-2005-4fe6-b43f-6b0b62531246
+		summarizeBy: none
+		sourceColumn: completed_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column section_key
+		dataType: int64
+		isHidden
+		lineageTag: 81859baf-3a80-4104-b153-cf0314b7f4ef
+		summarizeBy: none
+		sourceColumn: section_key
+
+	column fault_type_key
+		dataType: int64
+		isHidden
+		lineageTag: d5b70568-747a-44ee-989a-b6873ff14232
+		summarizeBy: none
+		sourceColumn: fault_type_key
+
+	column suburb_key
+		dataType: int64
+		isHidden
+		lineageTag: 71963428-b142-4d07-9aba-34ab962ed0a1
+		summarizeBy: none
+		sourceColumn: suburb_key
+
+	column hex_key
+		dataType: int64
+		isHidden
+		lineageTag: e20fcfd9-70c0-428c-81dd-3ffbcc56377b
+		summarizeBy: none
+		sourceColumn: hex_key
+
+	/// Completed minus created, in days. Excludes nothing: filter out admin closures in measures.
+	column days_to_complete
+		dataType: double
+		formatString: 0.0
+		lineageTag: d18ab5a5-66dd-4300-b3c4-64f9ae00b88a
+		summarizeBy: none
+		sourceColumn: days_to_complete
+
+	/// Closed within 5 minutes of creation: counted as a request, excluded from durations and completions.
+	column is_admin_closure
+		dataType: boolean
+		lineageTag: c3ef8f19-da6e-4231-a5c3-66a9b348a1b5
+		sourceColumn: is_admin_closure
+
+	/// Later report of the same fault type in the same hexagon on the same SAST day.
+	column is_likely_repeat
+		dataType: boolean
+		lineageTag: 46527e1f-c974-4577-bf43-a294ea5e12a8
+		sourceColumn: is_likely_repeat
+
+	/// Has an H3 hexagon; unlocated requests cannot appear on the map.
+	column is_located
+		dataType: boolean
+		lineageTag: be02ff66-cd1c-4b72-b9e7-413ba82774cb
+		sourceColumn: is_located
+
+	partition fact_request = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "fact_request.parquet"))
+				in
+				    Source
+

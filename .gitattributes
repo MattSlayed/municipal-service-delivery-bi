@@ -1,0 +1,2 @@
+# Replace the local DataFolder path with a placeholder on commit (powerbi/datafolder-clean.sed)
+*.SemanticModel/definition/expressions.tmdl filter=datafolder

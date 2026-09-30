@@ -1,0 +1,56 @@
+/// Every H3 level-8 hexagon of the City, plus '0' for unlocated requests. coords feeds the Deneb Operations Map.
+table dim_hex
+	lineageTag: 30c1e7fa-32d5-4bb6-ac0b-f2321ee91187
+
+	column hex_key
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 1cd16dce-863e-4bf2-8b2d-ed33d6253aaf
+		summarizeBy: none
+		sourceColumn: hex_key
+
+	column hex_id
+		dataType: string
+		lineageTag: c6f6dba3-4551-43f4-a560-7569e411154a
+		sourceColumn: hex_id
+
+	column centroid_lat
+		dataType: double
+		lineageTag: a56945fa-c139-4e7f-97c9-22263eceec2b
+		dataCategory: Latitude
+		summarizeBy: none
+		sourceColumn: centroid_lat
+
+	column centroid_lon
+		dataType: double
+		lineageTag: e75aad82-c95a-4cb4-a527-ad83b1abb544
+		dataCategory: Longitude
+		summarizeBy: none
+		sourceColumn: centroid_lon
+
+	/// Hexagon ring as lon,lat pairs, wound clockwise, for Deneb.
+	column coords
+		dataType: string
+		lineageTag: 6684f701-f489-4098-8080-1bd3a9f8ee5a
+		sourceColumn: coords
+
+	column hex_label
+		dataType: string
+		lineageTag: b2234892-41a1-493b-8386-934175bef8ee
+		sourceColumn: hex_label
+
+	/// Suburb most requests in the hexagon name.
+	column area
+		dataType: string
+		lineageTag: 554c66b8-4924-43e1-86ae-7d27f9828884
+		sourceColumn: area
+
+	partition dim_hex = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dim_hex.parquet"))
+				in
+				    Source
+

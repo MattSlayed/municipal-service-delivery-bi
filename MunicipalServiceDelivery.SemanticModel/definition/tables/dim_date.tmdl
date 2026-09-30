@@ -1,0 +1,76 @@
+/// Calendar from 1 Jan 2020 to the last completion date. Related to fact_request on created_date (active) and completed_date (inactive).
+table dim_date
+	lineageTag: ad9953e0-8ccb-43a7-a665-cb8a9e3bc9f8
+	dataCategory: Time
+
+	column date
+		dataType: dateTime
+		isUnique
+		isKey
+		formatString: Short Date
+		lineageTag: 56cbcd8a-98bd-47cf-bae7-a73b00760ea0
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		lineageTag: 7431b01b-cc9a-4eb6-ac53-b55d530da034
+		summarizeBy: none
+		sourceColumn: year
+
+	column quarter
+		dataType: string
+		lineageTag: 6395b2d9-7379-42d4-b994-46df30dc4a9e
+		sourceColumn: quarter
+
+	column month_start
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: af43ecb5-0259-43b6-ab99-dd688f7c630b
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: 2b66475b-b8fa-462e-bc96-e31853b47934
+		sourceColumn: month_name
+		sortByColumn: month_start
+
+	/// Monday of the week.
+	column week_start
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: aa98fd58-941a-463f-b695-5b2b6cd68db3
+		summarizeBy: none
+		sourceColumn: week_start
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		dataType: string
+		lineageTag: 4e32436b-feac-42d4-a58b-95f815d8f789
+		sourceColumn: day_of_week
+
+	column is_2020
+		dataType: boolean
+		lineageTag: 523f31fb-123f-4765-9726-efeb20f2888e
+		sourceColumn: is_2020
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dim_date.parquet"))
+				in
+				    Source
+

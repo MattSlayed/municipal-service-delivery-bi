@@ -5,8 +5,9 @@ open work is building up, when to call in contractors, and where operations are 
 Its centrepiece is an **Operations Map** that highlights every location with open maintenance work
 on a chosen date.
 
-**Status: v1.0 in build.** The brief and spec are final, the data pipeline runs, and the
-Operations Map spec is render-tested; the Power BI model and report are next.
+**Status: v1.0 in build.** The brief and spec are final, the data pipeline runs, the
+Operations Map spec is render-tested, and the Power BI model is built and reconciled with the
+pipeline's row counts; measures and report pages are next.
 
 ![Operations Map render test, 31 March and 31 December 2020](docs/images/operations-map-render-test.png)
 
@@ -39,7 +40,10 @@ From the [product brief](_bmad-output/planning-artifacts/briefs/brief-municipal-
 
 ```
 pipeline/               Download, scope, clean, star schema, reference values
+MunicipalServiceDelivery.pbip
+                        Power BI project; the semantic model is text (TMDL) in *.SemanticModel/
 powerbi/deneb/          Operations Map spec, set-up guide and render test
+powerbi/mcp-setup.md    Power BI Authoring MCP set-up with Claude Code
 tests/                  pytest: cleaning rules, measure definitions, reconciliation
 docs/                   Research notes, data profile, generated data-quality report
 _bmad-output/           Brief, spec and later implementation artifacts (BMAD)
@@ -60,5 +64,18 @@ The pipeline takes about 20 seconds after the first download. Source data is pub
 City of Cape Town and is not stored in this repository. See the
 [data-quality report](docs/data-quality-report.md) for what the cleaning keeps, flags and
 quarantines.
+
+### Opening the Power BI project
+
+Run the pipeline first, then open `MunicipalServiceDelivery.pbip` in Power BI Desktop. Set the
+`DataFolder` parameter (Transform data → Edit parameters) to your clone's `data\processed\`
+folder, keeping the trailing backslash, and refresh. The committed value is a placeholder.
+
+A git filter keeps your own folder path out of commits. Turn it on once per clone:
+
+```
+git config filter.datafolder.clean "sed -E -f powerbi/datafolder-clean.sed"
+git config filter.datafolder.required true
+```
 
 Open the repo in Claude Code and run `/bmad-help` to see where the project is and what comes next.

@@ -1,0 +1,97 @@
+/// In-scope requests removed as provably invalid, with reason_code. In-scope rows = fact_request + quarantine.
+table quarantine
+	lineageTag: 510b0540-d02f-4db3-9408-163f83f0e10b
+
+	column notification_number
+		dataType: string
+		lineageTag: 61fb36a5-83be-48a5-9d32-22904c01ad95
+		sourceColumn: notification_number
+
+	column reference_number
+		dataType: string
+		lineageTag: 30e30e54-219d-48b2-8895-db4574aacf57
+		sourceColumn: reference_number
+
+	column creation_timestamp
+		dataType: string
+		lineageTag: 4ed56330-6962-4bc9-9b12-1a2542ce4436
+		sourceColumn: creation_timestamp
+
+	column completion_timestamp
+		dataType: string
+		lineageTag: f756946e-8e81-45db-bea9-f786e8054ac2
+		sourceColumn: completion_timestamp
+
+	column directorate
+		dataType: string
+		lineageTag: cd49722a-f145-4e7c-861d-22f0e1a4eb83
+		sourceColumn: directorate
+
+	column department
+		dataType: string
+		lineageTag: 5f30e820-0d02-4d2a-977d-e56cf17de8b2
+		sourceColumn: department
+
+	column branch
+		dataType: string
+		lineageTag: ac068728-d4c5-4b45-8677-3f48dc522912
+		sourceColumn: branch
+
+	column section
+		dataType: string
+		lineageTag: 9138e761-7951-4088-92ec-8b1754cd470b
+		sourceColumn: section
+
+	column code_group
+		dataType: string
+		lineageTag: 06781152-f2f7-4ad8-bd3f-23c14579ec2f
+		sourceColumn: code_group
+
+	column code
+		dataType: string
+		lineageTag: 6833ac67-ff6f-44b1-a30e-e10fde8b6635
+		sourceColumn: code
+
+	column cause_code_group
+		dataType: string
+		lineageTag: f101e863-8baf-477d-ad36-fdd3de882ca6
+		sourceColumn: cause_code_group
+
+	column cause_code
+		dataType: string
+		lineageTag: e1593eb4-85f8-45b7-bb51-0fab5103ecf2
+		sourceColumn: cause_code
+
+	column official_suburb
+		dataType: string
+		lineageTag: a1df22ea-923c-4676-90c7-4fd910a4ee11
+		sourceColumn: official_suburb
+
+	column latitude
+		dataType: string
+		lineageTag: bec2b677-b138-4af1-a632-7297fc6d0985
+		sourceColumn: latitude
+
+	column longitude
+		dataType: string
+		lineageTag: dd432e28-8d4d-49ad-93df-889f803372f2
+		sourceColumn: longitude
+
+	column h3_level8_index
+		dataType: string
+		lineageTag: 6f20259a-6fc0-4d88-9ba7-6b3e9e14e211
+		sourceColumn: h3_level8_index
+
+	column reason_code
+		dataType: string
+		lineageTag: 2b0db3c4-b56b-4899-8941-c95202d9ec8e
+		sourceColumn: reason_code
+
+	partition quarantine = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "quarantine.parquet"))
+				in
+				    Source
+

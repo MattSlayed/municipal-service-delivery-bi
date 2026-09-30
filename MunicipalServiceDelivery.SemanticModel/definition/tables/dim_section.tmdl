@@ -1,0 +1,35 @@
+/// Organisational unit that owns the request: department, branch, section. Missing values are 'Unassigned'.
+table dim_section
+	lineageTag: d9229751-218d-4856-86e2-efa39c09d41d
+
+	column section_key
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 2efb26f4-7820-431d-b082-51b0fb3a09b2
+		summarizeBy: none
+		sourceColumn: section_key
+
+	column department
+		dataType: string
+		lineageTag: 1bd2eaf8-d2b2-4ce2-bbbe-dfe6eacbb572
+		sourceColumn: department
+
+	column branch
+		dataType: string
+		lineageTag: 25ec2ab4-1b37-4ca8-9495-6efe83491308
+		sourceColumn: branch
+
+	column section
+		dataType: string
+		lineageTag: 8d03415c-ac0b-4645-a271-cd626f5d5a64
+		sourceColumn: section
+
+	partition dim_section = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dim_section.parquet"))
+				in
+				    Source
+

@@ -1,0 +1,29 @@
+/// Dates of 2020 for the as-at slicer. Deliberately NOT related to fact_request: a relationship would select requests created on the day instead of requests open on it.
+table as_at
+	lineageTag: 61456129-b31e-48b9-b9e1-31a8100bbe0c
+
+	column as_at_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: e5808e9a-8ee4-4cef-8baf-08fbaee8ca75
+		summarizeBy: none
+		sourceColumn: as_at_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 23:59:59 SAST on as_at_date.
+	column as_at_end
+		dataType: dateTime
+		lineageTag: 5c4c93ea-b0db-4e8e-a0d1-ddf25b317c2f
+		sourceColumn: as_at_end
+
+	partition as_at = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "as_at.parquet"))
+				in
+				    Source
+

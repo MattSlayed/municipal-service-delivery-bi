@@ -1,0 +1,25 @@
+relationship fact_request_section_key_dim_section_section_key
+	fromColumn: fact_request.section_key
+	toColumn: dim_section.section_key
+
+relationship fact_request_fault_type_key_dim_fault_type_fault_type_key
+	fromColumn: fact_request.fault_type_key
+	toColumn: dim_fault_type.fault_type_key
+
+relationship fact_request_suburb_key_dim_suburb_suburb_key
+	fromColumn: fact_request.suburb_key
+	toColumn: dim_suburb.suburb_key
+
+relationship fact_request_hex_key_dim_hex_hex_key
+	fromColumn: fact_request.hex_key
+	toColumn: dim_hex.hex_key
+
+relationship fact_request_created_date_dim_date_date
+	fromColumn: fact_request.created_date
+	toColumn: dim_date.date
+
+relationship fact_request_completed_date_dim_date_date
+	isActive: false
+	fromColumn: fact_request.completed_date
+	toColumn: dim_date.date
+

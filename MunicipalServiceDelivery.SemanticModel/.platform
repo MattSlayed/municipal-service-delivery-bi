@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "MunicipalServiceDelivery"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9699782f-c776-4fa1-a9bd-aef8158acdf2"
+  }
+}

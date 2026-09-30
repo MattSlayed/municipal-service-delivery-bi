@@ -1,0 +1,28 @@
+/// Data-quality rules with row counts, from the pipeline.
+table dq_summary
+	lineageTag: 22e7e789-22d8-4115-8074-72c8d3e3e72f
+
+	column rule
+		dataType: string
+		lineageTag: 1b8e1fce-2dc4-4265-ab83-6c7385ea8de0
+		sourceColumn: rule
+
+	column rows
+		dataType: int64
+		lineageTag: d48a6cd8-e78e-4ba5-9d9b-08b8154a2b94
+		summarizeBy: none
+		sourceColumn: rows
+
+	column action
+		dataType: string
+		lineageTag: b0121749-2468-4dda-9e93-f624bde3a509
+		sourceColumn: action
+
+	partition dq_summary = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "dq_summary.parquet"))
+				in
+				    Source
+

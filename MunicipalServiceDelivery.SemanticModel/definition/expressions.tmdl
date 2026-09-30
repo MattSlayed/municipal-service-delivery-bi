@@ -1,0 +1,6 @@
+/// Folder holding the pipeline's Parquet output (uv run python -m pipeline.run). Change this to your own clone's data\processed\ folder; keep the trailing backslash.
+expression DataFolder = "C:\path\to\municipal-service-delivery-bi\data\processed\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 4eab7ced-a216-48c0-81c1-38e68ca70d93
+
+	annotation PBI_ResultType = Text
+
