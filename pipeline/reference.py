@@ -77,19 +77,31 @@ def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str | list[str],
 
 
 def suburb_rank(df: pd.DataFrame, t: pd.Timestamp, sections: list[str], top: int = 10) -> dict:
-    """Inside each flagged section, suburbs by active open work, highest first."""
+    """Inside each flagged section, suburbs by active open work, highest first.
+
+    Requests with no suburb are not ranked: no contractor can be sent to them. Their active count
+    is reported beside the ranking instead (unknown_suburb_active).
+    """
     table = (
         weeks_to_clear(df, t, ["section", "official_suburb"])
         .drop(columns=["field_crew", "flag"]).reset_index()
     )
+    known = table.loc[table["official_suburb"].ne(config.UNKNOWN_SUBURB)]
     return {
         section: _records(
-            table.loc[table["section"].eq(section)]
+            known.loc[known["section"].eq(section)]
             .sort_values(["active", "official_suburb"], ascending=[False, True])
             .drop(columns="section").head(top).set_index("official_suburb")
         )
         for section in sections
     }
+
+
+def unknown_suburb_active(df: pd.DataFrame, t: pd.Timestamp, sections: list[str]) -> dict[str, int]:
+    """Active open work with no suburb, per flagged section: shown beside the suburb rank."""
+    unknown = df.loc[active_at(df, t) & df["official_suburb"].eq(config.UNKNOWN_SUBURB)]
+    counts = unknown.groupby("section").size()
+    return {section: int(counts.get(section, 0)) for section in sections}
 
 
 def age_buckets(df: pd.DataFrame, t: pd.Timestamp) -> dict[str, int]:
@@ -159,6 +171,7 @@ def compute(df: pd.DataFrame, scoped_rows: int, quarantine: pd.DataFrame) -> dic
             "weeks_to_clear_by_section": _records(by_section),
             "flagged_sections": flagged,
             "suburb_rank_in_flagged_sections": suburb_rank(df, t, flagged),
+            "unknown_suburb_active_in_flagged_sections": unknown_suburb_active(df, t, flagged),
         }
     return reference
 

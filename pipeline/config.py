@@ -31,6 +31,7 @@ FIELD_CODE_GROUPS = {
 }
 
 UNLOCATED_HEX = "0"
+UNKNOWN_SUBURB = "Unknown suburb"  # label for requests with no suburb; shown beside the suburb rank, never in it
 ADMIN_CLOSURE_SECONDS = 300
 ACTIVE_MAX_AGE_DAYS = 90  # older open work is "stuck": blocked, not short of capacity
 MIN_WEEKLY_COMPLETIONS = 5

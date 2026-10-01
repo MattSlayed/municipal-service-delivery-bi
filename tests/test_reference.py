@@ -90,6 +90,20 @@ def test_administrative_section_is_never_flagged():
     assert not row["flag"]
 
 
+def test_unknown_suburb_is_shown_beside_the_rank_not_in_it():
+    rows = (
+        [("A", "2020-03-15", None, False, config.UNKNOWN_SUBURB)] * 5
+        + [("A", "2020-03-15", None, False, "GUGULETU")] * 3
+        + [("A", "2020-03-15", None, False, "PHILIPPI")] * 2
+    )
+    df = pd.DataFrame(rows, columns=["section", "created_at", "completed_at", "is_admin_closure", "official_suburb"])
+    df["created_at"] = pd.to_datetime(df["created_at"])
+    df["completed_at"] = pd.to_datetime(df["completed_at"])
+    ranked = reference.suburb_rank(df, T, ["A"])["A"]
+    assert [row["official_suburb"] for row in ranked] == ["GUGULETU", "PHILIPPI"]
+    assert reference.unknown_suburb_active(df, T, ["A"]) == {"A": 5}
+
+
 REFERENCE_FILE = config.PROCESSED_DIR / "reference_values.json"
 
 

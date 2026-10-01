@@ -7,7 +7,6 @@ import pandas as pd
 from . import config
 
 UNASSIGNED = "Unassigned"
-UNKNOWN_SUBURB = "Unknown suburb"
 
 
 def prepare_labels(clean: pd.DataFrame) -> pd.DataFrame:
@@ -18,7 +17,7 @@ def prepare_labels(clean: pd.DataFrame) -> pd.DataFrame:
     df["section"] = df["section"].fillna(df["branch"].map(lambda b: f"{b} (unassigned)", na_action="ignore"))
     for column in ["department", "branch", "section"]:
         df[column] = df[column].fillna(UNASSIGNED)
-    df["official_suburb"] = df["official_suburb"].fillna(UNKNOWN_SUBURB)
+    df["official_suburb"] = df["official_suburb"].fillna(config.UNKNOWN_SUBURB)
     df["is_informal_settlement"] = df["code_group"].str.contains("INFORMAL SETTLEMENTS")
     return df
 
