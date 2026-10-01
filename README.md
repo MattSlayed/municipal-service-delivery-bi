@@ -7,7 +7,10 @@ on a chosen date.
 
 **Status: v1.0 in build.** The brief and spec are final, the data pipeline runs, the
 Operations Map spec is render-tested, and the Power BI model is built and reconciled with the
-pipeline's row counts; measures and report pages are next.
+pipeline's row counts. The workload measures (open, active and stuck work on a chosen date) match
+the pipeline on every test date; the contractor flag and report pages are next.
+
+![DAX test: Open Now, Active and Stuck against the pipeline's reference values, all PASS](docs/images/v1.0-dax-test.png)
 
 ![Operations Map render test, 31 March and 31 December 2020](docs/images/operations-map-render-test.png)
 
@@ -66,6 +69,10 @@ City of Cape Town and is not stored in this repository. See the
 quarantines.
 
 ### Opening the Power BI project
+
+Clone to a short path such as `C:\dev\`. Power BI Desktop will not save a project file whose
+full path is longer than 256 characters, and report visuals are saved about 110 characters deep
+inside the repository.
 
 Run the pipeline first, then open `MunicipalServiceDelivery.pbip` in Power BI Desktop. Set the
 `DataFolder` parameter (Transform data → Edit parameters) to your clone's `data\processed\`

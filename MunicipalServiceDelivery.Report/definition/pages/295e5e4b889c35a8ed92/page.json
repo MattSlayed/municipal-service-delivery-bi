@@ -4,5 +4,10 @@
   "displayName": "Page 1",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "pageBinding": {
+    "name": "ae7d3aa706601eb1070b",
+    "type": "Default",
+    "parameters": []
+  }
 }

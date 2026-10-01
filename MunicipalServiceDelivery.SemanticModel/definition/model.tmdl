@@ -10,7 +10,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling","DaxQueryView_Desktop"]
 
 annotation PBI_QueryOrder = ["fact_request","dim_date","dim_section","dim_fault_type","dim_suburb","dim_hex","as_at","dq_summary","quarantine","DataFolder"]
 

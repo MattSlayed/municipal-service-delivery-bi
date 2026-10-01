@@ -2,6 +2,30 @@
 table fact_request
 	lineageTag: 1bb80c5e-c015-40c1-9a3f-286c44ddff59
 
+	measure 'Open Now' =
+			
+			VAR t = MAX ( as_at[as_at_end] )               -- 1. the end of the chosen day
+			RETURN
+			    CALCULATE (
+			        COUNTROWS ( fact_request ),
+			        fact_request[created_at] <= t,                                          -- 2. created on or before t
+			        ISBLANK ( fact_request[completed_at] ) || fact_request[completed_at] > t  -- 3. still open at t
+			    )
+		formatString: 0
+		lineageTag: f3c49969-4c23-46ca-9523-01fd1a20af89
+
+	measure Active =
+			
+			VAR d = MAX ( as_at[as_at_date] )
+			RETURN
+			    CALCULATE ( [Open Now], fact_request[created_date] >= d - 90 )
+		formatString: 0
+		lineageTag: 19f00fa0-fca3-4ece-bca5-edde40c9b11a
+
+	measure Stuck = [Open Now] - [Active]
+		formatString: 0
+		lineageTag: 14a01013-0f9e-4187-8ce0-0abb633ee4b3
+
 	/// City notification number.
 	column request_id
 		dataType: string
