@@ -26,6 +26,59 @@ table fact_request
 		formatString: #,0
 		lineageTag: 14a01013-0f9e-4187-8ce0-0abb633ee4b3
 
+	/// Clean requests created in the period (via the active created_date relationship). Includes likely repeats and admin closures.
+	measure 'Requests In' = COUNTROWS ( fact_request )
+		formatString: #,0
+		lineageTag: e17e533c-3a8f-4784-b450-9cdde5972612
+
+	/// Clean requests completed in the period, excluding admin closures (closed within 5 minutes). Uses the inactive completed_date relationship.
+	measure Completions =
+			CALCULATE (
+			    COUNTROWS ( fact_request ),
+			    USERELATIONSHIP ( fact_request[completed_date], dim_date[date] ),  -- dates now mean completion dates
+			    NOT ISBLANK ( fact_request[completed_at] ),                          -- open requests are not completions
+			    fact_request[is_admin_closure] = FALSE ()                            -- admin closures are not repairs
+			)
+		formatString: #,0
+		lineageTag: d3ae6add-6a5e-4dc4-9ba5-3a8579230d42
+
+	/// Requests In minus Completions: positive means open work grew in the period.
+	measure 'Net Change' = [Requests In] - [Completions]
+		formatString: +#,0;-#,0;0
+		lineageTag: e73bc53c-597f-40a4-98db-3e4db53c1885
+
+	/// Completions over the four full Monday-to-Sunday weeks ending on or before the as-at date, divided by 4. Ignores any date filter: the window is set by the as_at slicer.
+	measure 'Avg Weekly Completions' =
+			VAR d = MAX ( as_at[as_at_date] )
+			VAR dow = WEEKDAY ( d, 2 )                                -- 1 = Monday ... 7 = Sunday
+			VAR window_end = d - dow + 1 + IF ( dow = 7, 7, 0 )       -- Monday after the last full week (exclusive)
+			VAR window_start = window_end - 28                        -- four weeks earlier
+			RETURN
+			    DIVIDE (
+			        CALCULATE (
+			            [Completions],
+			            REMOVEFILTERS ( dim_date ),
+			            dim_date[date] >= window_start,
+			            dim_date[date] < window_end
+			        ),
+			        4
+			    )
+		formatString: #,0.00
+		lineageTag: 830f5118-92f1-41cc-9e7f-ce19450d7e0c
+
+	measure 'Weeks to Clear' =
+			
+			VAR avg_done = [Avg Weekly Completions]    -- weekly throughput: the measure we just added
+			RETURN
+			    IF (
+			        avg_done < 5,                  -- too little throughput to give a stable figure
+			        BLANK (),
+			        DIVIDE ( [Active], avg_done )  -- work that crews can clear: open work under 90 days old
+			    )
+		lineageTag: 1df9f1a3-c3b8-4217-a969-c327e1580a64
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	/// City notification number.
 	column request_id
 		dataType: string

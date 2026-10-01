@@ -23,6 +23,7 @@ ref table dim_hex
 ref table as_at
 ref table dq_summary
 ref table quarantine
+ref table Threshold
 
 ref cultureInfo en-ZA
 
