@@ -79,6 +79,20 @@ table fact_request
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'Contractor Flag' =
+			
+			VAR wtc = [Weeks to Clear]
+			VAR limit = [Threshold Value]
+			VAR is_field = SELECTEDVALUE ( dim_section[is_field_crew], FALSE () )
+			RETURN
+			    IF (
+			        HASONEVALUE ( dim_section[section] ) && is_field && wtc > limit,
+			        1,
+			        0
+			    )
+		formatString: 0
+		lineageTag: 9e8a8a87-3438-4bd1-a6af-3250e39b4aea
+
 	/// City notification number.
 	column request_id
 		dataType: string
