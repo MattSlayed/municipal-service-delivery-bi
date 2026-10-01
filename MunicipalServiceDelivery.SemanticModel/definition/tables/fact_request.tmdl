@@ -75,9 +75,8 @@ table fact_request
 			        BLANK (),
 			        DIVIDE ( [Active], avg_done )  -- work that crews can clear: open work under 90 days old
 			    )
+		formatString: 0.00
 		lineageTag: 1df9f1a3-c3b8-4217-a969-c327e1580a64
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Contractor Flag' =
 			
@@ -92,6 +91,36 @@ table fact_request
 			    )
 		formatString: 0
 		lineageTag: 9e8a8a87-3438-4bd1-a6af-3250e39b4aea
+
+	/// Number of sections whose Contractor Flag is raised at the as-at date and threshold.
+	measure 'Flagged Sections' = SUMX ( VALUES ( dim_section[section] ), [Contractor Flag] )
+		formatString: #,0
+		lineageTag: 8c8938f9-793b-454a-87ba-8e74fac18fb8
+
+	/// Inside a flagged section, the suburb's position by Active, highest first (ties share a rank). Blank outside flagged sections, for Unknown suburb and for suburbs with no active work.
+	measure 'Suburb Rank' =
+			VAR section_flagged = CALCULATE ( [Contractor Flag], REMOVEFILTERS ( dim_suburb ) )   -- the flag of the section, not the suburb
+			VAR suburb = SELECTEDVALUE ( dim_suburb[suburb] )
+			RETURN
+			    IF (
+			        HASONEVALUE ( dim_suburb[suburb] )
+			            && section_flagged = 1
+			            && suburb <> "Unknown suburb"   -- no contractor can be sent there: shown beside the rank
+			            && [Active] > 0,
+			        RANKX (
+			            FILTER ( ALL ( dim_suburb[suburb] ), dim_suburb[suburb] <> "Unknown suburb" ),   -- every named suburb, whatever the visual shows
+			            [Active],
+			            ,
+			            DESC
+			        )
+			    )
+		formatString: 0
+		lineageTag: 80c02335-11e7-47e7-98f7-f56822355838
+
+	/// Active work with no suburb in the current section(s): shown beside the suburb rank, never ranked.
+	measure 'Unknown Suburb Active' = CALCULATE ( [Active], dim_suburb[suburb] = "Unknown suburb" )
+		formatString: #,0
+		lineageTag: bdb9dd86-0b29-4939-8ae0-6a02169072be
 
 	/// City notification number.
 	column request_id

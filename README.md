@@ -7,8 +7,9 @@ on a chosen date.
 
 **Status: v1.0 in build.** The brief and spec are final, the data pipeline runs, the
 Operations Map spec is render-tested, and the Power BI model is built and reconciled with the
-pipeline's row counts. The workload measures (open, active and stuck work on a chosen date) match
-the pipeline on every test date; the contractor flag and report pages are next.
+pipeline's row counts. The workload, weekly-flow and contractor-flag measures, including the
+suburb ranking inside a flagged section, match the pipeline's reference values in all six
+[DAX tests](powerbi/dax-tests/). The report pages are next.
 
 ![DAX test: Open Now, Active and Stuck against the pipeline's reference values, all PASS](docs/images/v1.0-dax-test.png)
 
@@ -46,8 +47,10 @@ pipeline/               Download, scope, clean, star schema, reference values
 MunicipalServiceDelivery.pbip
                         Power BI project; the semantic model is text (TMDL) in *.SemanticModel/
 powerbi/deneb/          Operations Map spec, set-up guide and render test
+powerbi/dax-tests/      DAX queries that test each measure against the pipeline's reference values
 powerbi/mcp-setup.md    Power BI Authoring MCP set-up with Claude Code
 tests/                  pytest: cleaning rules, measure definitions, reconciliation
+scripts/                Data profiling; build_dax_tests.py writes powerbi/dax-tests/
 docs/                   Research notes, data profile, generated data-quality report
 _bmad-output/           Brief, spec and later implementation artifacts (BMAD)
 _bmad/, .claude/skills/ BMAD install for Claude Code
@@ -61,6 +64,7 @@ on Windows.
 ```
 uv run python -m pipeline.run   # downloads the City's data, writes data/processed/*.parquet
 uv run pytest                   # cleaning rules, measure definitions, reconciliation
+uv run python scripts/build_dax_tests.py   # DAX tests from the reference values
 ```
 
 The pipeline takes about 20 seconds after the first download. Source data is published by the
