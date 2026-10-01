@@ -19,11 +19,11 @@ table fact_request
 			VAR d = MAX ( as_at[as_at_date] )
 			RETURN
 			    CALCULATE ( [Open Now], fact_request[created_date] >= d - 90 )
-		formatString: 0
+		formatString: #,0
 		lineageTag: 19f00fa0-fca3-4ece-bca5-edde40c9b11a
 
 	measure Stuck = [Open Now] - [Active]
-		formatString: 0
+		formatString: #,0
 		lineageTag: 14a01013-0f9e-4187-8ce0-0abb633ee4b3
 
 	/// City notification number.
