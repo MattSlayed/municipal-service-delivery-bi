@@ -1,4 +1,7 @@
-from pipeline import model
+import pandas as pd
+import pytest
+
+from pipeline import config, model
 
 ANTICLOCKWISE = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]
 
@@ -13,3 +16,31 @@ def test_map_coords_are_wound_clockwise():
 def test_map_coords_keep_clockwise_rings_unchanged():
     clockwise = ANTICLOCKWISE[::-1]
     assert model._map_coords(clockwise) == "0.00000,0.00000,0.00000,1.00000,1.00000,1.00000,1.00000,0.00000,0.00000,0.00000"
+
+
+def sections(rows):
+    return pd.DataFrame(rows, columns=["department", "branch", "section"]).assign(official_suburb="X", code_group="WATER")
+
+
+def test_missing_section_is_labelled_by_its_branch():
+    df = model.prepare_labels(sections([
+        ("Technical Services", "Reticulation", None),
+        (None, None, None),
+    ]))
+    assert df["section"].tolist() == ["Reticulation (unassigned)", "Unassigned"]
+
+
+def test_section_dimension_marks_field_crews():
+    df = model.prepare_labels(sections([
+        ("Technical Services", "Reticulation", "Reticulation WW Conveyance"),
+        ("Commercial Services", "Customer Services (Water)", "Billing Management"),
+    ]))
+    dim = model._section_dimension(df).set_index("section")
+    assert dim.loc["Reticulation WW Conveyance", "is_field_crew"]
+    assert not dim.loc["Billing Management", "is_field_crew"]
+
+
+def test_section_dimension_rejects_duplicate_section_names():
+    df = sections([("D1", "B1", "Same"), ("D2", "B2", "Same")])
+    with pytest.raises(ValueError, match="unique"):
+        model._section_dimension(df)

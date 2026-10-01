@@ -25,6 +25,15 @@ table dim_section
 		lineageTag: 8d03415c-ac0b-4645-a271-cd626f5d5a64
 		sourceColumn: section
 
+	column is_field_crew
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: cedcc1b7-b919-4898-8059-a0d3fb478962
+		summarizeBy: none
+		sourceColumn: is_field_crew
+
+		annotation SummarizationSetBy = Automatic
+
 	partition dim_section = m
 		mode: import
 		source =

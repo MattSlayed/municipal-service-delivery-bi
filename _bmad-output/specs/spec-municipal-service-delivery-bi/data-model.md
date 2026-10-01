@@ -21,7 +21,7 @@ erDiagram
 |---|---|---|
 | `fact_request` | One clean in-scope request | `request_id` (notification number), `created_at`, `completed_at` (SAST), `created_date`, `completed_date`, `section_key`, `fault_type_key`, `suburb_key`, `hex_key`, `days_to_complete`, `is_admin_closure`, `is_likely_repeat`, `is_located` |
 | `dim_date` | One day, 2020-01-01 to the last completion date | `date`, `week_start`, `month`, `quarter`, `is_2020` |
-| `dim_section` | One section | `department`, `branch`, `section`; missing values → "Unassigned section" |
+| `dim_section` | One section | `department`, `branch`, `section`, `is_field_crew`; a missing section → "<branch> (unassigned)", other missing values → "Unassigned". Section names are unique |
 | `dim_fault_type` | One `code` | `code_group`, `code`, `is_informal_settlement` |
 | `dim_suburb` | One official suburb | `suburb`; missing → "Unknown suburb" |
 | `dim_hex` | One H3 level-8 hexagon: every hexagon in the City's polygon file, any other hexagon used by a request, and `0` → "Unlocated" | `hex_id`, `hex_label`, `area` (the suburb most of its requests name), `centroid_lat`, `centroid_lon`, `coords` (the ring's 7 vertices as a flat `lon,lat,…` string, wound clockwise, for the Deneb map) |
@@ -33,5 +33,7 @@ erDiagram
 
 - Likely repeat: same `code`, same `hex_id` (located rows only) and same SAST creation day as an
   earlier request; the first report is not flagged.
+- Field crew: the sections listed in `FIELD_CREW_SECTIONS` (`pipeline/config.py`); only these
+  can raise the contractor flag.
 - Admin closure: completed within 5 minutes (300 seconds) of creation.
 - Quarantine reason codes: `NEGATIVE_DURATION`; `DUPLICATE_RECORD` (guard, expected 0).

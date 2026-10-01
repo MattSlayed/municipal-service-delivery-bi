@@ -35,6 +35,20 @@ ADMIN_CLOSURE_SECONDS = 300
 ACTIVE_MAX_AGE_DAYS = 90  # older open work is "stuck": blocked, not short of capacity
 MIN_WEEKLY_COMPLETIONS = 5
 DEFAULT_THRESHOLD_WEEKS = 3.0  # just above the pre-lockdown norm of 2.8-2.9 weeks
+
+# Sections whose work is done by field crews: the only ones the contractor flag may raise.
+# Administrative sections (billing, CRM, debt, revenue, policy) are shown but never flagged.
+# Names as in dim_section; a section with no name is labelled "<branch> (unassigned)".
+FIELD_CREW_SECTIONS = {
+    "Reticulation WW Conveyance",
+    "Reticulation Water Distribution",
+    "Reticulation (unassigned)",
+    "Informal Settlements:Operating and Maintenance",
+    "Meter Management",  # meters and water management devices are fitted and repaired on site
+    "Bulk Water Operations",
+    "Operations (South)",  # Wastewater branch
+    "Technical Services Reticulation",
+}
 REFERENCE_DATES = ["2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31"]
 AGE_BUCKETS = [(0, 7, "0-7 days"), (8, 30, "8-30 days"), (31, 90, "31-90 days"),
                (91, None, "Over 90 days (stuck)")]

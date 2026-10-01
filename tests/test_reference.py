@@ -58,7 +58,7 @@ def test_weeks_to_clear_and_flag():
     admin = [("A", "2020-03-10", "2020-03-10 00:01", True)] * 50  # never counted as throughput
     backlog = [("A", "2020-03-15", None, False)] * 28  # 28 active / 7 per week = 4 weeks
     stuck = [("A", "2019-11-01", None, False)] * 100  # over 90 days: excluded from weeks to clear
-    table = reference.weeks_to_clear(frame(completions + admin + backlog + stuck), T, "section")
+    table = reference.weeks_to_clear(frame(completions + admin + backlog + stuck), T, "section", {"A"})
     row = table.loc["A"]
     assert row["avg_weekly_completions"] == 7
     assert row["active"] == 28
@@ -69,16 +69,25 @@ def test_weeks_to_clear_and_flag():
 def test_weeks_to_clear_at_the_threshold_is_not_flagged():
     completions = [("A", "2020-02-20", f"2020-03-{d:02d} 12:00", False) for d in range(2, 30)]
     backlog = [("A", "2020-03-15", None, False)] * 21  # exactly 3 weeks
-    row = reference.weeks_to_clear(frame(completions + backlog), T, "section").loc["A"]
+    row = reference.weeks_to_clear(frame(completions + backlog), T, "section", {"A"}).loc["A"]
     assert row["weeks_to_clear"] == config.DEFAULT_THRESHOLD_WEEKS
     assert not row["flag"]
 
 
 def test_weeks_to_clear_is_blank_below_minimum_throughput():
     completions = [("B", "2020-02-20", "2020-03-10 12:00", False)] * (4 * config.MIN_WEEKLY_COMPLETIONS - 1)
-    table = reference.weeks_to_clear(frame(completions + [("B", "2020-03-15", None, False)]), T, "section")
+    table = reference.weeks_to_clear(frame(completions + [("B", "2020-03-15", None, False)]), T, "section", {"B"})
     assert pd.isna(table.loc["B", "weeks_to_clear"])
     assert not table.loc["B", "flag"]
+
+
+def test_administrative_section_is_never_flagged():
+    completions = [("Billing", "2020-02-20", f"2020-03-{d:02d} 12:00", False) for d in range(2, 30)]
+    backlog = [("Billing", "2020-03-15", None, False)] * 70  # 10 weeks to clear
+    row = reference.weeks_to_clear(frame(completions + backlog), T, "section", {"A"}).loc["Billing"]
+    assert row["weeks_to_clear"] == 10
+    assert not row["field_crew"]
+    assert not row["flag"]
 
 
 REFERENCE_FILE = config.PROCESSED_DIR / "reference_values.json"

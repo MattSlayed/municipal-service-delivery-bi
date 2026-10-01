@@ -18,7 +18,7 @@ def dq_summary(raw_rows: int, scoped_rows: int, clean: pd.DataFrame, quarantine:
         ("Likely repeat report (same fault, hexagon and day)", int(clean["is_likely_repeat"].sum()),
          "Kept; flagged"),
         ("No location", int((~clean["is_located"]).sum()), "Kept; not on the map"),
-        ("No section", int(clean["section"].isna().sum()), "Kept as 'Unassigned'"),
+        ("No section", int(clean["section"].isna().sum()), "Kept as '<branch> (unassigned)'"),
         ("Never completed", int(clean["completed_at"].isna().sum()), "Kept; open from creation onward"),
     ]
     return pd.DataFrame(rows, columns=["rule", "rows", "action"])

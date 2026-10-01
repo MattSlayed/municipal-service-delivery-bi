@@ -54,8 +54,13 @@ def four_week_window(t: pd.Timestamp) -> tuple[pd.Timestamp, pd.Timestamp]:
     return end - 4 * WEEK, end
 
 
-def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str | list[str]) -> pd.DataFrame:
-    """Active open work ÷ average weekly completions over the four full weeks ending at t."""
+def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str | list[str],
+                   field_crew: set[str] = frozenset()) -> pd.DataFrame:
+    """Active open work ÷ average weekly completions over the four full weeks ending at t.
+
+    The flag is raised only for groups in field_crew: contractors are not called for
+    administrative sections, however slowly they clear their work.
+    """
     start, end = four_week_window(t)
     done = counted_completions(df)
     in_window = done.loc[(done["completed_at"] >= start) & (done["completed_at"] < end)]
@@ -66,13 +71,17 @@ def weeks_to_clear(df: pd.DataFrame, t: pd.Timestamp, by: str | list[str]) -> pd
     table["active"] = table["active"].astype(int)
     enough = table["avg_weekly_completions"] >= config.MIN_WEEKLY_COMPLETIONS
     table["weeks_to_clear"] = np.where(enough, table["active"] / table["avg_weekly_completions"], np.nan)
-    table["flag"] = table["weeks_to_clear"] > config.DEFAULT_THRESHOLD_WEEKS
+    table["field_crew"] = table.index.isin(list(field_crew))
+    table["flag"] = table["field_crew"] & (table["weeks_to_clear"] > config.DEFAULT_THRESHOLD_WEEKS)
     return table.sort_values("weeks_to_clear", ascending=False)
 
 
 def suburb_rank(df: pd.DataFrame, t: pd.Timestamp, sections: list[str], top: int = 10) -> dict:
     """Inside each flagged section, suburbs by active open work, highest first."""
-    table = weeks_to_clear(df, t, ["section", "official_suburb"]).drop(columns="flag").reset_index()
+    table = (
+        weeks_to_clear(df, t, ["section", "official_suburb"])
+        .drop(columns=["field_crew", "flag"]).reset_index()
+    )
     return {
         section: _records(
             table.loc[table["section"].eq(section)]
@@ -135,7 +144,7 @@ def compute(df: pd.DataFrame, scoped_rows: int, quarantine: pd.DataFrame) -> dic
         t = as_at_end(date)
         open_now = df.loc[open_at(df, t)]
         by_hex = open_now.loc[open_now["is_located"]].groupby("h3_level8_index").size()
-        by_section = weeks_to_clear(df, t, "section")
+        by_section = weeks_to_clear(df, t, "section", config.FIELD_CREW_SECTIONS)
         flagged = by_section.index[by_section["flag"]].tolist()
         reference["as_at"][date] = {
             "open": len(open_now),

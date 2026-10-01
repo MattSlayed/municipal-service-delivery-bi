@@ -13,6 +13,9 @@ UNKNOWN_SUBURB = "Unknown suburb"
 def prepare_labels(clean: pd.DataFrame) -> pd.DataFrame:
     """Fill missing descriptive values with explicit labels, so no request drops out of a visual."""
     df = clean.copy()
+    # A section with no name is labelled by its branch, so section names stay unique: measures
+    # and reference values group by section name.
+    df["section"] = df["section"].fillna(df["branch"].map(lambda b: f"{b} (unassigned)", na_action="ignore"))
     for column in ["department", "branch", "section"]:
         df[column] = df[column].fillna(UNASSIGNED)
     df["official_suburb"] = df["official_suburb"].fillna(UNKNOWN_SUBURB)
@@ -21,7 +24,10 @@ def prepare_labels(clean: pd.DataFrame) -> pd.DataFrame:
 
 
 def build(df: pd.DataFrame, hexagons_path) -> dict[str, pd.DataFrame]:
-    dim_section = _dimension(df, ["department", "branch", "section"], "section_key")
+    dim_section = _section_dimension(df)
+    unknown = config.FIELD_CREW_SECTIONS - set(dim_section["section"])
+    if unknown:  # a typo in the list would silently stop a section from ever being flagged
+        raise ValueError(f"FIELD_CREW_SECTIONS names sections not in the data: {sorted(unknown)}")
     dim_fault_type = _dimension(df, ["code_group", "code", "is_informal_settlement"], "fault_type_key")
     dim_suburb = _dimension(df.rename(columns={"official_suburb": "suburb"}), ["suburb"], "suburb_key")
     dim_hex = _hex_dimension(df, hexagons_path)
@@ -53,6 +59,14 @@ def build(df: pd.DataFrame, hexagons_path) -> dict[str, pd.DataFrame]:
         "dim_hex": dim_hex,
         "as_at": _as_at(),
     }
+
+
+def _section_dimension(df: pd.DataFrame) -> pd.DataFrame:
+    dim = _dimension(df, ["department", "branch", "section"], "section_key")
+    if dim["section"].duplicated().any():
+        raise ValueError("Section names must be unique: measures group by them")
+    dim["is_field_crew"] = dim["section"].isin(config.FIELD_CREW_SECTIONS)
+    return dim
 
 
 def _dimension(df: pd.DataFrame, columns: list[str], key: str) -> pd.DataFrame:

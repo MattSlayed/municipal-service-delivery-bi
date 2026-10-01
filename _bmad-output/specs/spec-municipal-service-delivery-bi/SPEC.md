@@ -61,7 +61,7 @@ public portfolio evidence by 4 October 2026.
 - Requests created before 2020 are absent, so total open work is understated early in 2020. Comparisons over time use work less than 90 days old, complete from 31 March 2020.
 - Open work splits into **active** (open 90 days or less) and **stuck** (open more than 90 days). The contractor flag uses active work only: stuck work is blocked, not short of capacity, and belongs to Bottlenecks.
 - The contractor flag is raised per section; suburbs are ranked inside a flagged section, not flagged independently.
-- Only field-crew sections can be flagged. Administrative sections (billing, customer relations, debt, policy) are shown but never flagged: contractors are not called for them.
+- Only field-crew sections can be flagged. Administrative sections (billing, customer relations, debt, policy) are shown but never flagged: contractors are not called for them. The list is `FIELD_CREW_SECTIONS` in `pipeline/config.py`, confirmed 1 October 2026, and is marked by `dim_section[is_field_crew]`.
 
 ## Non-goals
 
@@ -92,4 +92,3 @@ every number shown passes its automated comparison with the pipeline's reference
 ## Open Questions
 
 - Map rendering: the Deneb spec (`powerbi/deneb/`) renders correctly outside Power BI; confirm in Power BI Desktop, or fall back to a bubble map at hexagon centres.
-- Which sections are field crews? The pipeline marks them in `dim_section`; the list is confirmed before the flag measure is written.

@@ -11,7 +11,7 @@ table fact_request
 			        fact_request[created_at] <= t,                                          -- 2. created on or before t
 			        ISBLANK ( fact_request[completed_at] ) || fact_request[completed_at] > t  -- 3. still open at t
 			    )
-		formatString: 0
+		formatString: #,0
 		lineageTag: f3c49969-4c23-46ca-9523-01fd1a20af89
 
 	measure Active =
