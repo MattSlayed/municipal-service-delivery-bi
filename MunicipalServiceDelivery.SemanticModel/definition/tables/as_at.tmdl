@@ -9,9 +9,11 @@ table as_at
 		summarizeBy: none
 		sourceColumn: as_at_date
 
-		annotation UnderlyingDateTimeDataType = Date
+		changedProperty = DataType
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	/// 23:59:59 SAST on as_at_date.
 	column as_at_end

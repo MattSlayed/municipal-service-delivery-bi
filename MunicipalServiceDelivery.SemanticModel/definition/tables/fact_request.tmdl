@@ -122,6 +122,70 @@ table fact_request
 		formatString: #,0
 		lineageTag: bdb9dd86-0b29-4939-8ae0-6a02169072be
 
+	/// Page title naming the as-at date.
+	measure 'Report Title' = "Water and Sanitation: open work on " & FORMAT ( MAX ( as_at[as_at_date] ), "d mmmm yyyy" )
+		displayFolder: Report labels
+		lineageTag: b9256083-ad81-4af0-885c-5e210d5e43ff
+
+	/// Names of the sections whose Contractor Flag is raised, or a note that none are.
+	measure 'Flagged Section Names' =
+			VAR names =
+			    CONCATENATEX (
+			        FILTER ( VALUES ( dim_section[section] ), [Contractor Flag] = 1 ),
+			        dim_section[section], ", ", dim_section[section], ASC
+			    )
+			RETURN
+			    IF ( names = "", "None: crews are keeping up", names )
+		displayFolder: Report labels
+		lineageTag: c231a2e8-ae5a-4287-8dda-c2412df0909b
+
+	/// Text status of one section: the label that goes with the bar colour, so the flag never relies on colour alone.
+	measure 'Flag Status' =
+			VAR is_field = SELECTEDVALUE ( dim_section[is_field_crew], FALSE () )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        NOT HASONEVALUE ( dim_section[section] ), BLANK (),
+			        [Contractor Flag] = 1, "Call contractors",
+			        NOT is_field, "Administrative: never flagged",
+			        ISBLANK ( [Weeks to Clear] ), "Too few completions to judge",
+			        "Within capacity"
+			    )
+		displayFolder: Report labels
+		lineageTag: 800a3d71-8a32-46f0-b2fb-31cef86fdb95
+
+	/// Bar colour per section for conditional formatting: critical red when flagged, blue for other field-crew sections, grey for administrative ones.
+	measure 'Section Bar Colour' =
+			VAR is_field = SELECTEDVALUE ( dim_section[is_field_crew], FALSE () )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        [Contractor Flag] = 1, "#D03B3B",
+			        is_field, "#2A78D6",
+			        "#898781"
+			    )
+		displayFolder: Report labels
+		lineageTag: a5248c50-64eb-4cd6-a938-3c9403ac56cf
+
+	/// Title of the suburb table: prompts for a selection, names the flagged section, or says why there is no ranking.
+	measure 'Suburb Table Title' =
+			VAR s = SELECTEDVALUE ( dim_section[section] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        NOT HASONEVALUE ( dim_section[section] ), "Select a red bar to rank that section's suburbs",
+			        CALCULATE ( [Contractor Flag], REMOVEFILTERS ( dim_suburb ) ) = 1,
+			            "Where to send contractors: " & s & ", suburbs by active work",
+			        s & " is not flagged, so its suburbs are not ranked"
+			    )
+		displayFolder: Report labels
+		lineageTag: 41683b52-fff6-42ec-9f91-5857d5aa2bd9
+
+	/// Title of the weeks-to-clear chart, stating the current threshold.
+	measure 'Weeks to Clear Title' = "Weeks to clear active work, by section. Red: field crew above the " & FORMAT ( [Threshold Value], "0.0" ) & "-week threshold"
+		displayFolder: Report labels
+		lineageTag: 1fdf6817-306e-4045-bd6d-fc56e442b7f3
+
 	/// City notification number.
 	column request_id
 		dataType: string
